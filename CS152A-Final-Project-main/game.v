@@ -1,5 +1,6 @@
 module game(clk,sw,an,seg);
     input clk;
+    input bntR;
     input [9:0] sw;
     output [3:0] an;
     output [6:0] seg;
@@ -14,6 +15,7 @@ module game(clk,sw,an,seg);
     wire debounced7;
     wire debounced8;
     wire debounced9;
+    wire debouncedRst;
     
     debounce debounce0(.in(sw[0]),.master_clk(clk),.out(debounced0));
     debounce debounce1(.in(sw[1]),.master_clk(clk),.out(debounced1));
@@ -25,18 +27,23 @@ module game(clk,sw,an,seg);
     debounce debounce7(.in(sw[7]),.master_clk(clk),.out(debounced7));
     debounce debounce8(.in(sw[8]),.master_clk(clk),.out(debounced8));
     debounce debounce9(.in(sw[9]),.master_clk(clk),.out(debounced9));
+    debounce debounceRst(.in(btnR),.master_clk(clk),.out(debouncedRst));
+
+
+    wire fast_clk;
+
+    clocks clk_div(.master_clk(clk),.RESET(debouncedRst),.fast_clk(fast_clk));
+    
     
     wire [6:0] dig1;
     wire [6:0] dig2;
     wire [6:0] dig3;
     wire [6:0] dig4;
     
-    control controlUnit(.clk(clk),.num_0_db(debounced0),.num_1_db(debounced1),.num_2_db(debounced2),.num_3_db(debounced3),
+    control controlUnit(.clk(clk),.RESET(debouncedRst),.num_0_db(debounced0),.num_1_db(debounced1),.num_2_db(debounced2),.num_3_db(debounced3),
     .num_4_db(debounced4),.num_5_db(debounced5),.num_6_db(debounced6),.num_7_db(debounced7),.num_8_db(debounced8),
     .num_9_db(debounced9),.dig1(dig1),.dig2(dig2),.dig3(dig3),.dig4(dig4));
-    
-    
-    
 
+    cathode_and_anode display(.clk(fast_clk),.dig1(dig1),.dig2(dig2),.dig3(dig3),.dig4(dig4),.cathode(seg),.anode(an));
 
 endmodule
