@@ -1,8 +1,8 @@
-module(RESET,secret);
+module random(RESET,secret);
     input RESET;
-    output wire [3:0] secret = 0;
+    output wire [3:0] secret;
 
-    reg [3:0] secret_reg = 0;
+    reg [3:0] secret_reg;
 
     assign secret = secret_reg;
 

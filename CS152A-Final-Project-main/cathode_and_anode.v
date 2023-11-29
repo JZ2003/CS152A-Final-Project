@@ -20,11 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module cathode_and_anode(clk,dig1,dig2,dig3,dig4,cathode, anode);
+module cathode_and_anode(fast_clk,dig1,dig2,dig3,dig4,cathode, anode);
     // input switches
 //    input ADJ;
 //    input SEL;
-    input clk; // Messing Around
+    input fast_clk; // Messing Around
     // input clks
 //    input blink_clk;
 //    input fast_clk;
@@ -46,66 +46,66 @@ module cathode_and_anode(clk,dig1,dig2,dig3,dig4,cathode, anode);
         if(itr == 0) begin
             itr <= itr + 2'b1;
             anode_reg <= 4'b0111;
-            if (ADJ && !SEL) begin
-                if (blink_clk) begin
-                    cathode_reg <= minsTens; 
-                end
-                else begin
-                    cathode_reg <= 7'b1111111;
-                end
-            end
-            else begin 
-                cathode_reg <= minsTens;
-            end 
+//            if (ADJ && !SEL) begin
+//                if (blink_clk) begin
+//                    cathode_reg <= minsTens; 
+//                end
+//                else begin
+//                    cathode_reg <= 7'b1111111;
+//                end
+//            end
+//            else begin 
+            cathode_reg <= dig1;
+//            end 
         end
         
         else if (itr == 1) begin
             itr <= itr + 2'b1;
             anode_reg <= 4'b1011;
-            if (ADJ && !SEL) begin
-                if (blink_clk) begin
-                    cathode_reg <= minsOnes; 
-                end
-                else begin
-                    cathode_reg <= 7'b1111111;
-                end
-            end
-            else begin 
-                cathode_reg <= minsOnes;
-            end       
+//            if (ADJ && !SEL) begin
+//                if (blink_clk) begin
+//                    cathode_reg <= minsOnes; 
+//                end
+//                else begin
+//                    cathode_reg <= 7'b1111111;
+//                end
+//            end
+//            else begin 
+                cathode_reg <= dig2;
+//            end       
         end
         
         else if (itr == 2) begin
             itr <= itr + 2'b1;
             anode_reg <= 4'b1101;
-            if (ADJ && SEL) begin
-                if (blink_clk) begin
-                    cathode_reg <= secsTens; 
-                end
-                else begin
-                    cathode_reg <= 7'b1111111;
-                end
-            end
-            else begin 
-                cathode_reg <= secsTens;
-            end
+//            if (ADJ && SEL) begin
+//                if (blink_clk) begin
+//                    cathode_reg <= secsTens; 
+//                end
+//                else begin
+//                    cathode_reg <= 7'b1111111;
+//                end
+//            end
+//            else begin 
+                cathode_reg <= dig3;
+//            end
         
         end
         
         else if (itr == 3) begin
             itr <= 2'b00;
             anode_reg <= 4'b1110;
-            if (ADJ && SEL) begin
-                if (blink_clk) begin
-                    cathode_reg <= secsOnes; 
-                end
-                else begin
-                    cathode_reg <= 7'b1111111;
-                end
-            end
-            else begin 
-                cathode_reg <= secsOnes;
-            end
+//            if (ADJ && SEL) begin
+//                if (blink_clk) begin
+//                    cathode_reg <= secsOnes; 
+//                end
+//                else begin
+//                    cathode_reg <= 7'b1111111;
+//                end
+//            end
+//            else begin 
+                cathode_reg <= dig4;
+//            end
         end
         
     end
