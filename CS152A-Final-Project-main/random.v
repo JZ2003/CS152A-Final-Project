@@ -8,7 +8,7 @@ module random(RESET,secret);
 
     always @(posedge RESET) begin
         if (RESET) begin
-            secret_reg <= $random % 10;
+            secret_reg <= $urandom % 10;
         end
     end
 
