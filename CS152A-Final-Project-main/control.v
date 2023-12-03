@@ -19,11 +19,15 @@ module control(
     dig4
 );
 
-input proceed;
+//Input Clock
 input clk;
+
+//Input Buttons
+input PROCEED;
 input RESET;
 input CONFIRM;
 
+//Input Switches
 input num_0_db;
 input num_1_db;
 input num_2_db;
@@ -35,53 +39,61 @@ input num_7_db;
 input num_8_db;
 input num_9_db;
 
+//Output Seven-seg Encodings
 output wire [6:0] dig1;
 output wire [6:0] dig2;
 output wire [6:0] dig3;
 output wire [6:0] dig4;
 
+//Internal Seven-seg Registers
 reg [6:0] dig1_reg;
 reg [6:0] dig2_reg;
 reg [6:0] dig3_reg;
 reg [6:0] dig4_reg;
 
-reg [1:0] time_reg;
 
+//Register to store the secret
 reg [3:0] secret_reg;
 
+//Register to store the guess made by players
 reg [3:0] guess; 
 
-// reg confirmed;
-// reg proceed;
 
+//Rigister to store the number of tries made:
+    /*
+        numTry starts with the value of 4. 
+        Each wrong guess reduces it by 1. When it becomes 0 without a correct guess, the player fails.
+        If a correct guess is made, the player wins with a score of numTry (it can be 0,1,2,3).
+    */
 reg [2:0] numTry;
-reg [2:0] state;
+
 // Define states
-localparam IDLE = 3'b000;
-localparam CONFIRM_PRESSED = 3'b001;
-localparam PROCEED_PRESSED = 3'b010;
-localparam FAIL = 3'b011;
-localparam SUCCESS = 3'b100;        
+localparam IDLE = 2'b00;
+localparam CONFIRM_PRESSED = 2'b01;
+// localparam PROCEED_PRESSED = 3'b010;
+localparam FAIL = 2'b10;
+localparam SUCCESS = 2'b11;        
+reg [1:0] state;
 
 
 
 always @ (posedge clk or posedge RESET) begin
     if (RESET) begin
+        //RESET's checking precedes all others'.
         dig1_reg <= 7'b1111111;
         dig2_reg <= 7'b1111111;
         dig3_reg <= 7'b1111111;
         dig4_reg <= 7'b1111111;
-        // status_confirm <= 0;
         state <= IDLE;
         numTry <= 4;
         secret_reg <= $urandom % 10;
-        guess <= 12; //Indicate that no guess has been made yet.
+        guess <= 12; //Use 12 to indicate that no guess has been made yet.
     end
     else begin
         case (state)
             SUCCESS: 
                 // Show SUCCESS INFO
-                // Don't transition to any other state. Only reset will change FAIL state.        
+                // Don't transition to any other state. Only reset will transition out SUCCESS state to IDLE.        
                 dig1_reg <= 7'b0010010; // 'S'
                 dig2_reg <= 7'b1000110; //'C'
                 dig3_reg <= 7'b1111111;
@@ -96,19 +108,17 @@ always @ (posedge clk or posedge RESET) begin
                         dig4_reg <= 7'b1000000;     
             FAIL:
                 // Show Fail INFO
-                // Don't transition to any other state. Only reset will change FAIL state.
+                // Don't transition to any other state. Only reset will transition out FAIL state to IDLE.   
                 dig1_reg <= 7'b0000000;
                 dig2_reg <= 7'b0000000;
                 dig3_reg <= 7'b0000000;
                 dig4_reg <= 7'b0000000;
-
+                //TODO: Make the FAIL display more informative
             IDLE:
-                if (numTry == 0) begin
-                    state <= FAIL;
-                end
-                else if(CONFIRM && guess != 12) begin
+                if(CONFIRM && guess != 12) begin
+                    //If a switch is toggled and the confirm button is pressed
                     numTry <= numTry - 1;
-                    state <= CONFIRM_PRESSED;
+                    state <= CONFIRM_PRESSED; //Transition to CONFIRM_PRESSED state the next clock pulse
                 end
     
                 //Display and remember the user selected number
@@ -158,14 +168,17 @@ always @ (posedge clk or posedge RESET) begin
                 end 
 
             CONFIRM_PRESSED:
-                if(PROCEED) begin
-                    state <= PROCEED_PRESSED;
-                end
-
                 if (guess == secret_reg) begin
-                    state <= SUCCESS;
-
+                    state <= SUCCESS; //Transition to SUCCESS if it's a right guess.
                 end
+                else if (numTry == 0) begin
+                    state <= FAIL; //Transition to FAIL if it's a wrong guess AND numTry is 0.
+                end
+
+                if(PROCEED) begin
+                    state <= IDLE; //Transition to IDLE once the PROCEED button is pressed.
+                end
+
                 else if (guess < secret_reg) begin 
                     dig1_reg <= 7'b1000111; //'L'
                     dig2_reg <= 7'b1000000; // 'O'
@@ -177,15 +190,8 @@ always @ (posedge clk or posedge RESET) begin
                     dig2_reg <= 7'b1111001; // 'I'
                     dig3_reg <= 7'b1111111;
                     dig4_reg <= 7'b1111111;         
-                end
-                 
-            PROCEED_PRESSED:
-                if (!PROCEED) begin
-                    state <= IDLE;
-                end
+                end     
         end                
-
-        
     end
 
 
