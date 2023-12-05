@@ -1,4 +1,4 @@
-module game(clk,btnR,btnL,sw,an,seg);
+module game(clk,btnU,btnR,btnL,sw,an,seg);
     input clk;
     input btnR;
     input btnL;

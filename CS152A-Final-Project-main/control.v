@@ -92,105 +92,115 @@ always @ (posedge clk or posedge RESET) begin
     else begin
         case (state)
             SUCCESS: 
-                // Show SUCCESS INFO
-                // Don't transition to any other state. Only reset will transition out SUCCESS state to IDLE.        
-                dig1_reg <= 7'b0010010; // 'S'
-                dig2_reg <= 7'b1000110; //'C'
-                dig3_reg <= 7'b1111111;
-                case (numTry)
-                    3:
-                        dig4_reg <= 7'b0110000;
-                    2:
-                        dig4_reg <= 7'b0100100;
-                    1:
-                        dig4_reg <= 7'b1111001;
-                    0:                
-                        dig4_reg <= 7'b1000000;     
+                begin 
+                    // Show SUCCESS INFO
+                    // Don't transition to any other state. Only reset will transition out SUCCESS state to IDLE.        
+                    dig1_reg <= 7'b0010010; // 'S'
+                    dig2_reg <= 7'b1000110; //'C'
+                    dig3_reg <= 7'b1111111;
+                    case (numTry)
+                            3:
+                                dig4_reg <= 7'b0110000;
+                            2:
+                                dig4_reg <= 7'b0100100;
+                            1:
+                                dig4_reg <= 7'b1111001;
+                            0:                
+                                dig4_reg <= 7'b1000000;    
+                    endcase
+                end
             FAIL:
-                // Show Fail INFO
-                // Don't transition to any other state. Only reset will transition out FAIL state to IDLE.   
-                dig1_reg <= 7'b0000000;
-                dig2_reg <= 7'b0000000;
-                dig3_reg <= 7'b0000000;
-                dig4_reg <= 7'b0000000;
-                //TODO: Make the FAIL display more informative
-            IDLE:
-                if(CONFIRM && guess != 12) begin
-                    //If a switch is toggled and the confirm button is pressed
-                    numTry <= numTry - 1;
-                    state <= CONFIRM_PRESSED; //Transition to CONFIRM_PRESSED state the next clock pulse
-                end
-    
-                //Display and remember the user selected number
-                if (num_0_db == 1'b1) begin
-                    dig4_reg <= 7'b1000000;
-                    guess <= 0;
-                end
-                else if (num_1_db == 1'b1) begin 
-                    dig4_reg <= 7'b1111001;
-                    guess <= 1;
-                end 
-                else if (num_2_db == 1'b1) begin 
-                    dig4_reg <= 7'b0100100;
-                    guess <= 2;
-                end     
-                else if (num_3_db == 1'b1) begin 
-                    dig4_reg <= 7'b0110000;
-                    guess <= 3;
-                end 
-                else if (num_4_db == 1'b1) begin 
-                    dig4_reg <= 7'b0011001;
-                    guess <= 4;
-                end     
-                else if (num_5_db == 1'b1) begin 
-                    dig4_reg <= 7'b0010010;
-                    guess <= 5;
-                end     
-                else if (num_6_db == 1'b1) begin 
-                    dig4_reg <= 7'b0000010;
-                    guess <= 6;
-                end     
-                else if (num_7_db == 1'b1) begin 
-                    dig4_reg <= 7'b1111000;
-                    guess <= 7;
-                end 
-                else if (num_8_db == 1'b1) begin 
+                begin
+                    // Show Fail INFO
+                    // Don't transition to any other state. Only reset will transition out FAIL state to IDLE.   
+                    dig1_reg <= 7'b0000000;
+                    dig2_reg <= 7'b0000000;
+                    dig3_reg <= 7'b0000000;
                     dig4_reg <= 7'b0000000;
-                    guess <= 8;
-                end     
-                else if (num_9_db == 1'b1) begin 
-                    dig4_reg <= 7'b0010000;
-                    guess <= 9;
-                end 
-                else begin
-                    dig4_reg <= 7'b1111111;
-                    guess <= 12;
-                end 
+                    //TODO: Make the FAIL display more informative
+                 end
+            IDLE:
+                begin
+                    if(CONFIRM && guess != 12) begin
+                        //If a switch is toggled and the confirm button is pressed
+                        numTry <= numTry - 1;
+                        state <= CONFIRM_PRESSED; //Transition to CONFIRM_PRESSED state the next clock pulse
+                    end
+        
+                    //Display and remember the user selected number
+                    if (num_0_db == 1'b1) begin
+                        dig4_reg <= 7'b1000000;
+                        guess <= 0;
+                    end
+                    else if (num_1_db == 1'b1) begin 
+                        dig4_reg <= 7'b1111001;
+                        guess <= 1;
+                    end 
+                    else if (num_2_db == 1'b1) begin 
+                        dig4_reg <= 7'b0100100;
+                        guess <= 2;
+                    end     
+                    else if (num_3_db == 1'b1) begin 
+                        dig4_reg <= 7'b0110000;
+                        guess <= 3;
+                    end 
+                    else if (num_4_db == 1'b1) begin 
+                        dig4_reg <= 7'b0011001;
+                        guess <= 4;
+                    end     
+                    else if (num_5_db == 1'b1) begin 
+                        dig4_reg <= 7'b0010010;
+                        guess <= 5;
+                    end     
+                    else if (num_6_db == 1'b1) begin 
+                        dig4_reg <= 7'b0000010;
+                        guess <= 6;
+                    end     
+                    else if (num_7_db == 1'b1) begin 
+                        dig4_reg <= 7'b1111000;
+                        guess <= 7;
+                    end 
+                    else if (num_8_db == 1'b1) begin 
+                        dig4_reg <= 7'b0000000;
+                        guess <= 8;
+                    end     
+                    else if (num_9_db == 1'b1) begin 
+                        dig4_reg <= 7'b0010000;
+                        guess <= 9;
+                    end 
+                    else begin
+                        dig4_reg <= 7'b1111111;
+                        guess <= 12;
+                    end 
+                end
 
             CONFIRM_PRESSED:
-                if (guess == secret_reg) begin
-                    state <= SUCCESS; //Transition to SUCCESS if it's a right guess.
-                end
-                else if (numTry == 0) begin
-                    state <= FAIL; //Transition to FAIL if it's a wrong guess AND numTry is 0.
-                end
-
-                if(PROCEED) begin
-                    state <= IDLE; //Transition to IDLE once the PROCEED button is pressed.
-                end
-
-                else if (guess < secret_reg) begin 
-                    dig1_reg <= 7'b1000111; //'L'
-                    dig2_reg <= 7'b1000000; // 'O'
-                    dig3_reg <= 7'b1111111;
-                    dig4_reg <= 7'b1111111;         
-                end
-                else if (guess > secret_reg) begin 
-                    dig1_reg <= 7'b0001001; //'H'
-                    dig2_reg <= 7'b1111001; // 'I'
-                    dig3_reg <= 7'b1111111;
-                    dig4_reg <= 7'b1111111;         
-                end     
+                begin
+                    if (guess == secret_reg) begin
+                        state <= SUCCESS; //Transition to SUCCESS if it's a right guess.
+                    end
+                    else if (numTry == 0) begin
+                        state <= FAIL; //Transition to FAIL if it's a wrong guess AND numTry is 0.
+                    end
+    
+                    if(PROCEED) begin
+                        state <= IDLE; //Transition to IDLE once the PROCEED button is pressed.
+                    end
+    
+                    else if (guess < secret_reg) begin 
+                        dig1_reg <= 7'b1000111; //'L'
+                        dig2_reg <= 7'b1000000; // 'O'
+                        dig3_reg <= 7'b1111111;
+                        dig4_reg <= 7'b1111111;         
+                    end
+                    else if (guess > secret_reg) begin 
+                        dig1_reg <= 7'b0001001; //'H'
+                        dig2_reg <= 7'b1111001; // 'I'
+                        dig3_reg <= 7'b1111111;
+                        dig4_reg <= 7'b1111111;         
+                    end
+                 end
+             endcase
         end                
     end
 
