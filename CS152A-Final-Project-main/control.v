@@ -126,6 +126,9 @@ always @ (posedge clk or posedge RESET) begin
                         numTry <= numTry - 1;
                         state <= CONFIRM_PRESSED; //Transition to CONFIRM_PRESSED state the next clock pulse
                     end
+
+                    dig1_reg <= 7'b1111111;
+                    dig2_reg <= 7'b1111111;
         
                     //Display and remember the user selected number
                     if (num_0_db == 1'b1) begin
