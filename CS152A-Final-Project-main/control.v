@@ -52,6 +52,8 @@ reg [6:0] dig3_reg;
 reg [6:0] dig4_reg;
 
 
+reg [3:0] lfsr_state = 4'b1101;
+
 //Register to store the secret
 reg [3:0] secret_reg;
 
@@ -86,7 +88,8 @@ always @ (posedge clk or posedge RESET) begin
         dig4_reg <= 7'b1111111;
         state <= IDLE;
         numTry <= 4;
-        secret_reg <= $urandom % 10;
+        lfsr_state <= lfsr_state ^ (lfsr_state << 1) ^(lfsr_state << 3);
+        secret_reg <= lfsr_state % 10;
         guess <= 12; //Use 12 to indicate that no guess has been made yet.
     end
     else begin
